@@ -131,7 +131,7 @@ var we={m:cm,i:ci,q:q.question,o:cm==='small'?q.options:null,a:ua,t:new Date().t
 if(!WL.some(function(w){return w.m===we.m&&w.i===we.i;}))WL.push(we);
 }
 us();sv();show();
-if(cm==='small'){var delay=ok?650:2200;setTimeout(function(){if(wrongDrill)nextWrongDrill();else if(cm==='small')nx();},delay);}
+if(cm==='small'&&ok){setTimeout(function(){if(wrongDrill)nextWrongDrill();else if(cm==='small')nx();},650);}
 };
 
 function data(){return gd();}
@@ -205,7 +205,7 @@ window.nextWrongDrill=function(){if(WL.length===0){wrongDrill=false;cm='wrong';d
 
 window.pickRandom=function(){var d=data();if(d.length<=1){ci=0;return;}var used=cleanSeen(cm);if(used.length>=d.length)used=[];var pool=[];for(var i=0;i<d.length;i++){if(used.indexOf(i)<0&&i!==ci)pool.push(i);}if(pool.length===0){for(var j=0;j<d.length;j++){if(used.indexOf(j)<0)pool.push(j);}}if(pool.length===0){used=[];for(var k=0;k<d.length;k++){if(k!==ci)pool.push(k);}}seen[cm]=used;ci=pool[Math.floor(Math.random()*pool.length)];sv();};
 window.pv=function(){pickRandom();show();};
-window.nx=function(){pickRandom();show();};
+window.nx=function(){if(wrongDrill){nextWrongDrill();return;}pickRandom();show();};
 window.rd=function(){pickRandom();show();};
 window.clrW=function(){if(confirm('清空错题本？')){WL=[];sv();us();if(cm==='wrong')showWL();}};
 
