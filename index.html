@@ -66,9 +66,7 @@ body{font-family:"Microsoft YaHei",Arial,sans-serif;background:#f5f5f5;line-heig
 </div>
 <div class="ct" id="main"></div>
 <div class="nb">
-<button class="bt bt-x" onclick="pv()">上一题</button>
-<button class="bt bt-s" onclick="nx()">下一题</button>
-<button class="bt bt-p" onclick="rd()">随机</button>
+<button class="bt bt-s" onclick="nx()">随机下一题</button>
 <button class="bt bt-d" onclick="clrW()">清空错题本</button>
 </div>
 </div>
@@ -101,16 +99,20 @@ window.so=function(idx){
 var k=cm+'_'+ci;
 if(ans[k+'_g']!==undefined)return;
 var q=data()[ci];
-// 处理多选
+// 单选：点击后立即自动批改；多选：选满正确答案数量后自动批改
 if(Array.isArray(q.answer)){
 if(!ans[k])ans[k]=[];
 var pos=ans[k].indexOf(idx);
 if(pos>=0)ans[k].splice(pos,1);
 else ans[k].push(idx);
+sv();
+if(ans[k].length>=q.answer.length){doGrade();return;}
+show();
 }else{
 ans[k]=idx;
+sv();
+doGrade();
 }
-sv();show();
 };
 
 window.doGrade=function(){
@@ -153,8 +155,8 @@ else if(sel){cls='op cng';mark='✗';}
 }else if(sel){cls='op sel';}
 h+='<div class="'+cls+'" onclick="so('+i+')">'+item.options[i]+'<span class="mark">'+mark+'</span></div>';
 }
-if(sa!==undefined&&sa!==null&&gd2===undefined){
-h+='<div style="margin-top:20px;padding:15px;background:#fff;border-radius:6px;border:1px dashed #ddd;text-align:center"><p style="margin-bottom:10px;font-weight:bold">确认提交？</p><button class="bt bt-s" style="margin:5px" onclick="doGrade()">提交批改</button></div>';
+if(sa!==undefined&&sa!==null&&gd2===undefined&&isMulti){
+h+='<div style="margin-top:15px;padding:10px;background:#fff8e1;border-radius:6px;color:#8a6d00;font-weight:bold">多选题：请选择 '+item.answer.length+' 个选项，选满后自动批改。</div>';
 }
 if(gd2!==undefined){
 h+='<div style="margin-top:15px;padding:10px;background:'+(gd2?'#e8f5e9':'#ffe0e0')+';border-radius:6px;font-weight:bold;color:'+(gd2?'#27ae60':'#e74c3c')+'">'+(gd2?'✓ 回答正确！':'✗ 回答错误')+'</div>';
@@ -196,12 +198,13 @@ document.getElementById('main').innerHTML=h;
 
 window.reviewW=function(idx){var w=WL[idx];cm=w.m;ci=w.i;document.querySelectorAll('.mb').forEach(function(b){b.classList.remove('ac')});var t=document.querySelector('.mb[data-m="'+w.m+'"]');if(t)t.classList.add('ac');var k=cm+'_'+ci;delete ans[k+'_g'];sv();us();show();};
 
-window.pv=function(){var d=data();ci=(ci-1+d.length)%d.length;show();};
-window.nx=function(){var d=data();ci=(ci+1)%d.length;show();};
-window.rd=function(){var d=data();ci=Math.floor(Math.random()*d.length);show();};
+window.pickRandom=function(){var d=data();if(d.length<=1){ci=0;return;}var ni=ci;while(ni===ci){ni=Math.floor(Math.random()*d.length);}ci=ni;};
+window.pv=function(){pickRandom();show();};
+window.nx=function(){pickRandom();show();};
+window.rd=function(){pickRandom();show();};
 window.clrW=function(){if(confirm('清空错题本？')){WL=[];sv();us();if(cm==='wrong')showWL();}};
 
-document.addEventListener('keydown',function(e){if(cm==='wrong')return;if(e.key==='ArrowLeft')pv();else if(e.key==='ArrowRight')nx();else if(e.key==='ArrowUp')rd();});
+document.addEventListener('keydown',function(e){if(cm==='wrong')return;if(e.key==='ArrowRight'||e.key==='ArrowUp'||e.key==='ArrowLeft')nx();});
 window.onload=init;
 </script>
 </body>
